@@ -1,6 +1,7 @@
 package com.example.kento.devbookandroidclient;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
@@ -22,14 +23,19 @@ import java.util.Map;
 
 public class CreateAccountActivity extends Activity {
 
-    private final String EMPTYFIELDS = "The first three fields must be entered";
+    private final String EMPTYFIELDS = "All non optional fields must be entered";
     private final String INVALIDINFO = "Invalid entries";
     private final String CREATEACCOUNTERROR = "Failed to create account";
     private final String SUCCESS = "Account created successfully";
+    private final String PASSWORDERROR = "Password do not match";
 
+    //TODO fix so that keyboard does not cover material
     EditText userName;
     EditText password;
+    EditText confirmPassword;
     EditText email;
+    EditText city;
+    EditText country;
     EditText bio;
     Button createAccount;
     Button cancel;
@@ -39,18 +45,21 @@ public class CreateAccountActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_account);
 
-        //TODO fix hint
         userName = (EditText) findViewById(R.id.userName);
         password = (EditText) findViewById(R.id.password);
         email = (EditText) findViewById(R.id.email);
+        city = (EditText) findViewById(R.id.city);
+        country = (EditText) findViewById(R.id.country);
         bio = (EditText) findViewById(R.id.bio);
+        confirmPassword = (EditText) findViewById(R.id.confirmPassword);
 
         createAccount = (Button) findViewById(R.id.createAccount);
         createAccount.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                if(userName.getText().equals("") || password.getText().equals("")
-                        || email.getText().equals("")){
+                if(userName.getText().toString().equals("") || password.getText().toString().equals("")
+                        || email.getText().toString().equals("") || city.getText().toString().equals("")
+                        || country.getText().toString().equals("")){
                     Toast.makeText(getApplicationContext(),
                             EMPTYFIELDS, Toast.LENGTH_LONG).show();
                 }
@@ -58,6 +67,10 @@ public class CreateAccountActivity extends Activity {
                         || !email.getText().toString().contains("@")){
                     Toast.makeText(getApplicationContext(),
                             INVALIDINFO, Toast.LENGTH_LONG).show();
+                }
+                else if(!password.getText().toString().equals(confirmPassword.getText().toString())){
+                    Toast.makeText(getApplicationContext(),
+                            PASSWORDERROR, Toast.LENGTH_LONG).show();
                 }
                 else{
                     try {
@@ -81,6 +94,12 @@ public class CreateAccountActivity extends Activity {
     }
 
     private void createAccount() throws Exception {
+        ProgressDialog progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+        progress.show();
+
         String url = Resources.SERVER_WEB_APP_NAME + Resources.CREATE_REQUEST;
         RequestQueue queue = Volley.newRequestQueue(this);
         final String userNameEncrypted = Resources.issueToken(userName.getText().toString());
@@ -108,11 +127,14 @@ public class CreateAccountActivity extends Activity {
                 params.put(Resources.USERNAME,userNameEncrypted);
                 params.put(Resources.PASSWORD,passwordEncrypted);
                 params.put(Resources.EMAIL,emailEncrypted);
+                params.put(Resources.CITY, city.getText().toString().toLowerCase());
+                params.put(Resources.COUNTRY, country.getText().toString().toLowerCase());
                 return params;
             }
         };
         hideKeyboard();
         queue.add(stringRequest);
+        progress.dismiss();
     }
 
     private void hideKeyboard() {

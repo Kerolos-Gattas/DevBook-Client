@@ -1,8 +1,10 @@
 package com.example.kento.devbookandroidclient;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.os.Bundle;
@@ -17,12 +19,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.kento.UserInterface.UserMainActivity;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AccountActivity extends Activity {
 
+    //TODO logout if app is destroyed
     private final String EMPTYFIELDS = "All fields must be entered";
     private final String INVALIDLOGIN = "Invalid userName or password";
     private final String LOGINERROR = "Failed to login";
@@ -36,6 +40,7 @@ public class AccountActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
+
         userName = (EditText) findViewById(R.id.userName);
         password = (EditText) findViewById(R.id.password);
         login = (Button) findViewById(R.id.login);
@@ -73,18 +78,26 @@ public class AccountActivity extends Activity {
     }
 
     private void performLogin() throws Exception {
+
+        final ProgressDialog progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+        progress.show();
+
         String url = Resources.SERVER_WEB_APP_NAME + Resources.LOGIN_REQUEST;
         RequestQueue queue = Volley.newRequestQueue(this);
         final String userNameEncrypted = Resources.issueToken(userName.getText().toString());
         final String passwordEncrypted = Resources.issueToken(password.getText().toString());
-
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        //TODO implement response
-                        Toast.makeText(getApplicationContext(),
-                                "Success", Toast.LENGTH_LONG).show();
+                        progress.dismiss();
+                        Intent intent = new Intent(AccountActivity.this, UserMainActivity.class);
+                        intent.putExtra(Resources.SERVER_RESPONSE, response);
+                        intent.putExtra(Resources.USERNAME, userNameEncrypted);
+                        startActivity(intent);
                     }
                 }, new Response.ErrorListener() {
             @Override

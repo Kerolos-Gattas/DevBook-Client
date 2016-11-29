@@ -2,11 +2,14 @@
     <string name="app_name">DevBook Android Client</string>
     <string name="userName">User Name</string>
     <string name="password">Password</string>
-    <string name="createuserName">User Name: must be at least 4 characters</string>
-    <string name="createpassword">Password: must be at least 8 characters</string>
+    <string name="createuserName">Must be at least 4 characters</string>
+    <string name="createpassword">Must be at least 8 characters</string>
+    <string name="confirmPassword">Confirm Password</string>
     <string name="login">Login</string>
     <string name="createAccount">New to DevBook? create an account</string>
     <string name="email">Email</string>
+    <string name="city">City</string>
+    <string name="country">Country</string>
     <string name="Bio">Tell others about your developer experience (optional)</string>
     <string name="welcome">Welcome to DevBook: A social app made for developers</string>
     <string name="title_activity_main_user">MainUserActivity</string>
@@ -21,4 +24,7 @@
     <string name="action_example">Example action</string>
 
     <string name="action_settings">Settings</string>
+    <string name="title_activity_user_main">UserMainActivity</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>
