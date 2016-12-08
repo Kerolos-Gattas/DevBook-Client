@@ -81,7 +81,7 @@ public class AccountActivity extends Activity {
 
         final ProgressDialog progress = new ProgressDialog(this);
         progress.setTitle("Loading");
-        progress.setMessage("Wait while loading...");
+        progress.setMessage("Please Wait while loading...");
         progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
         progress.show();
 
@@ -102,6 +102,7 @@ public class AccountActivity extends Activity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                progress.dismiss();
                 Toast.makeText(getApplicationContext(),
                         INVALIDLOGIN, Toast.LENGTH_LONG).show();
             }

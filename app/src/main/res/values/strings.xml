@@ -6,17 +6,21 @@
     <string name="createpassword">Must be at least 8 characters</string>
     <string name="confirmPassword">Confirm Password</string>
     <string name="login">Login</string>
-    <string name="createAccount">New to DevBook? create an account</string>
+    <string name="createAccount">New to DevBook? Create an account</string>
     <string name="email">Email</string>
     <string name="city">City</string>
     <string name="country">Country</string>
     <string name="Bio">Tell others about your developer experience (optional)</string>
     <string name="welcome">Welcome to DevBook: A social app made for developers</string>
-    <string name="title_activity_main_user">MainUserActivity</string>
 
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="projectTitle">Project title</string>
+    <string name="location">Project location:</string>
+    <string name="projectDescription">Project Description</string>
+    <string name="projectTools">Project tools (e.g. github, IDE, etc...) (Optional)</string>
+    <string name="languages">Languages (e.g. Java, C++, JavaScript) (Optional)</string>
+    <string name="createProject">Create Project</string>
+
+    <string name="title_activity_main_user">MainUserActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

@@ -30,15 +30,15 @@ public class CreateAccountActivity extends Activity {
     private final String PASSWORDERROR = "Password do not match";
 
     //TODO fix so that keyboard does not cover material
-    EditText userName;
-    EditText password;
-    EditText confirmPassword;
-    EditText email;
-    EditText city;
-    EditText country;
-    EditText bio;
-    Button createAccount;
-    Button cancel;
+    private EditText userName;
+    private EditText password;
+    private EditText confirmPassword;
+    private EditText email;
+    private EditText city;
+    private EditText country;
+    private EditText bio;
+    private Button createAccount;
+    private Button cancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +96,7 @@ public class CreateAccountActivity extends Activity {
     private void createAccount() throws Exception {
         ProgressDialog progress = new ProgressDialog(this);
         progress.setTitle("Loading");
-        progress.setMessage("Wait while loading...");
+        progress.setMessage("Please Wait while loading...");
         progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
         progress.show();
 
@@ -129,6 +129,7 @@ public class CreateAccountActivity extends Activity {
                 params.put(Resources.EMAIL,emailEncrypted);
                 params.put(Resources.CITY, city.getText().toString().toLowerCase());
                 params.put(Resources.COUNTRY, country.getText().toString().toLowerCase());
+                params.put(Resources.BIO, bio.getText().toString());
                 return params;
             }
         };

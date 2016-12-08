@@ -1,5 +1,7 @@
 package com.kento.UserInterface;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -22,21 +24,30 @@ import com.android.volley.toolbox.Volley;
 import com.example.kento.devbookandroidclient.R;
 import com.example.kento.devbookandroidclient.Resources;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class UserMainActivity extends AppCompatActivity {
 
     private final String LOGOUTERROR = "Failed to Logout";
-
+    private final String PROJECTSERROR = "Failed to load current projects";
+    //TODO screen title
     //TODO back button
     private ListView mDrawerList;
     private ArrayAdapter<String> mAdapter;
     private ActionBarDrawerToggle mDrawerToggle;
+    private ListView projectList;
+    private ArrayAdapter<String> projectAdapter;
     private DrawerLayout mDrawerLayout;
     private String mActivityTitle;
     private String logoutCredentials;
     private String userName;
+    private String[] projectTitles;
+    private int[] projectIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +64,18 @@ public class UserMainActivity extends AppCompatActivity {
         mDrawerList = (ListView)findViewById(R.id.navList);
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mActivityTitle = getTitle().toString();
+
+        projectList = (ListView) findViewById(R.id.projectsUsersList);
+
+        projectList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(UserMainActivity.this, ProjectChat.class);
+                intent.putExtra("id", projectIds[position]);
+                intent.putExtra(Resources.USERNAME, userName);
+                startActivity(intent);
+            }
+        });
 
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -81,11 +104,86 @@ public class UserMainActivity extends AppCompatActivity {
 
         addDrawerItems();
         setupDrawer();
+        getCurrentProjects();
+    }
+
+    private void getCurrentProjects(){
+        ProgressDialog progress = new ProgressDialog(this);
+        progress.setTitle("Retrieving Requests");
+        progress.setMessage("Please Wait while we retrieve project requests");
+        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+        progress.show();
+
+        String url = Resources.SERVER_WEB_APP_PROJECT + Resources.CURRENT_PROJECTS;
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        Map<String,String> params = new HashMap<>();
+        params.put(Resources.USERNAME, userName);
+        CustomRequest jsObjRequest = new CustomRequest(Request.Method.POST, url, params, this.createRequestSuccessListener(), this.createRequestErrorListener());
+
+        requestQueue.add(jsObjRequest);
+        progress.dismiss();
+    }
+    private Response.Listener<JSONObject> createRequestSuccessListener() {
+        return new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONObject jsonObject = response;
+                    JSONArray projectTitle = (JSONArray) jsonObject.get("titles");
+                    JSONArray projectIDS = (JSONArray) jsonObject.get("ids");
+                    projectIds = new int[projectTitle.length()];
+                    projectTitles = new String[projectTitle.length()];
+
+                    for(int i = 0; i < projectTitle.length(); i++){
+                        projectIds[i] = (int) projectIDS.get(i);
+                        projectTitles[i] = (String) projectTitle.get(i);
+                    }
+
+                    setList();
+
+                } catch (JSONException e) {
+                    Toast.makeText(getApplicationContext(),
+                            PROJECTSERROR, Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
+        };
+    }
+
+    private Response.ErrorListener createRequestErrorListener() {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),
+                        PROJECTSERROR, Toast.LENGTH_LONG).show();
+                finish();
+            }
+        };
+    }
+
+    private void setList(){
+        projectAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, projectTitles);
+        projectList.setAdapter(projectAdapter);
     }
 
     private void handleSelection(AdapterView<?> parent, View view, int position, long id){
-        if(position == 1){
+        if(position == 3){
             logOut();
+        }
+        else if(position == 1){
+            Intent intent = new Intent(UserMainActivity.this, CreateProject.class);
+            intent.putExtra(Resources.USERNAME, userName);
+            startActivity(intent);
+        }
+        else if(position == 0){
+            Intent intent = new Intent(UserMainActivity.this, NearbyProjects.class);
+            intent.putExtra(Resources.USERNAME, userName);
+            startActivity(intent);
+        }
+        else if(position == 2){
+            Intent intent = new Intent(UserMainActivity.this, ProjectRequests.class);
+            intent.putExtra(Resources.USERNAME, userName);
+            startActivity(intent);
         }
     }
 
@@ -120,8 +218,9 @@ public class UserMainActivity extends AppCompatActivity {
 
     private void addDrawerItems() {
         //TODO projects and availability
-        String[] osArray = { "Developers around you", "Logout"};
-        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
+        String[] actions = { "Available projects near you", "Post a new project",
+                "Project requests", "Logout"};
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, actions);
         mDrawerList.setAdapter(mAdapter);
     }
 
